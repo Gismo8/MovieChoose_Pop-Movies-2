@@ -16,6 +16,8 @@ import com.gismo.moviechoose.adapter.MovieAdapter;
 import com.gismo.moviechoose.model.MovieObject;
 import com.gismo.moviechoose.R;
 import com.gismo.moviechoose.enums.SortingOptions;
+import com.gismo.moviechoose.task.AsyncTaskCompleteListener;
+import com.gismo.moviechoose.task.MoviesAsyncTask;
 import com.gismo.moviechoose.util.JSONUtils;
 import com.gismo.moviechoose.util.NetworkUtils;
 
@@ -85,42 +87,19 @@ public class MovieChooserActivity extends AppCompatActivity {
 
     private void startAsyncTask(SortingOptions sortingOption) {
         this.sortingOption = sortingOption;
-        new MoviesAnsycTask().execute();
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(GONE);
+        new MoviesAsyncTask(this, new FetchMyDataTaskCompleteListener()).execute(sortingOption);
     }
 
-
-    public class MoviesAnsycTask extends AsyncTask<Void, Void, List<MovieObject>> {
-
+    public class FetchMyDataTaskCompleteListener implements AsyncTaskCompleteListener<List<MovieObject>> {
         @Override
-        protected List<MovieObject> doInBackground(Void... voids) {
-            URL url = NetworkUtils.buildUrl(sortingOption);
-
-            List<MovieObject> newList;
-            try {
-                newList = JSONUtils.extractFeatureFromJson(NetworkUtils.getResponseFromHttpUrl(url));
-                return newList;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(GONE);
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(List<MovieObject> movieObjects) {
-            super.onPostExecute(movieObjects);
+        public void onTaskComplete(List<MovieObject> result) {
             recyclerView.setVisibility(View.VISIBLE);
-            movieObjectList = movieObjects;
+            movieObjectList = result;
             adapter.setMovieData(movieObjectList);
             progressBar.setVisibility(GONE);
             adapter.notifyDataSetChanged();
         }
     }
-
 }

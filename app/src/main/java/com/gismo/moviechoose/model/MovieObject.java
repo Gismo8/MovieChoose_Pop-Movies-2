@@ -18,7 +18,6 @@ public class MovieObject implements Serializable {
     String posterPath;
     String releaseDate;
     String voteAverage;
-    String vote_average;
     String overview;
 
 
@@ -44,7 +43,7 @@ public class MovieObject implements Serializable {
     }
 
     public String getVoteAverage() {
-        return vote_average;
+        return voteAverage;
     }
 
     public String getOverview() {
