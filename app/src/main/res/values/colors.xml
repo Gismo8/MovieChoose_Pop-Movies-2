@@ -5,4 +5,5 @@
     <color name="colorAccent">#e040fb</color>
     <color name="white">#FFFFFF</color>
     <color name="colorLight">#337b1fa2</color>
+    <color name="buttonInactive">#555555</color>
 </resources>

@@ -1,8 +1,10 @@
 package com.gismo.moviechoose.activity;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +15,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.gismo.moviechoose.R;
@@ -40,18 +43,29 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     protected MovieObject movieObject;
 
-    @BindView (R.id.posterImage) KenBurnsView posterImage;
-    @BindView (R.id.progressBar) ProgressBar progressBar;
-    @BindView (R.id.shapeOfView) ShapeOfView shapeOfView;
-    @BindView (R.id.titleView) TextView titleView;
-    @BindView (R.id.releaseDate) TextView releaseDate;
-    @BindView (R.id.averageVote) TextView averageVote;
-    @BindView (R.id.plotView) TextView plotView;
-    @BindView (R.id.reviewsRecyclerView) RecyclerView reviewsRecyclerView;
+    @BindView(R.id.posterImage)
+    KenBurnsView posterImage;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+    @BindView(R.id.shapeOfView)
+    ShapeOfView shapeOfView;
+    @BindView(R.id.titleView)
+    TextView titleView;
+    @BindView(R.id.releaseDate)
+    TextView releaseDate;
+    @BindView(R.id.averageVote)
+    TextView averageVote;
+    @BindView(R.id.plotView)
+    TextView plotView;
+    @BindView(R.id.reviewsRecyclerView)
+    RecyclerView reviewsRecyclerView;
+    @BindView(R.id.favoriteButton)
+    FloatingActionButton favoriteButton;
 
     ArrayList<VideoObject> videoObjects;
     ArrayList<ReviewObject> reviewObjects;
     ReviewAdapter reviewAdapter;
+    boolean favoriteButtonClicked;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,6 +80,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
         startAsyncTasks(String.valueOf(movieObject.getId()));
+        setupFloatingActionButton();
 
         bindActivity();
     }
@@ -135,5 +150,22 @@ public class MovieDetailsActivity extends AppCompatActivity {
             reviewAdapter.setReviewObjects(reviewObjects);
             reviewAdapter.notifyDataSetChanged();
         }
+    }
+
+    private void setupFloatingActionButton() {
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!favoriteButtonClicked) {
+                    favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.buttonInactive)));
+                    favoriteButtonClicked = true;
+                    Toast.makeText(MovieDetailsActivity.this, "You added this movie to your favorites", Toast.LENGTH_SHORT).show();
+                } else {
+                    favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                    Toast.makeText(MovieDetailsActivity.this, "You removed this movie from your favorites", Toast.LENGTH_SHORT).show();
+                    favoriteButtonClicked = false;
+                }
+            }
+        });
     }
 }
