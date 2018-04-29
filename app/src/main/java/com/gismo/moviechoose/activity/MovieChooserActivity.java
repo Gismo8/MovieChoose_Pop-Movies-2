@@ -33,6 +33,7 @@ import static android.view.View.GONE;
 public class MovieChooserActivity extends AppCompatActivity {
 
     protected List<MovieObject> movieObjectList;
+    protected ArrayList<MovieObject> favoriteMovies;
     protected MovieAdapter adapter;
     protected int NUMBER_OF_COLUMNS = 3;
     protected SortingOptions sortingOption = SortingOptions.TOP_RATED;
@@ -57,7 +58,18 @@ public class MovieChooserActivity extends AppCompatActivity {
         favMoviesDb = helper.getWritableDatabase();
 
         startAsyncTask(SortingOptions.MOST_POPULAR);
+    }
+
+
+    @Override
+    protected void onResume() {
+        refreshFavoriteMovies();
+        super.onResume();
+    }
+
+    private void refreshFavoriteMovies() {
         cursor = getAllFavoriteMovies();
+        favoriteMovies = createFavoriteMovieListFromCursor();
     }
 
     private Cursor getAllFavoriteMovies() {
@@ -71,14 +83,17 @@ public class MovieChooserActivity extends AppCompatActivity {
                 MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE);
     }
 
-    public ArrayList<MovieObject> createFavoriteMovieListFromCursor(Cursor cursor) {
+    public ArrayList<MovieObject> createFavoriteMovieListFromCursor() {
         ArrayList<MovieObject> favoriteMovies = new ArrayList<MovieObject>();
         while(cursor.moveToNext()) {
-           /* MovieObject movieObject = new MovieObject(
-                    cursor.getString(cursor.getColumnIndex(favMoviesDb.)
-            )
-
-            favoriteMovies.add(cursor.getString(mCursor.getColumnIndex(dbAdapter.KEY_NAME))); //add the item*/
+            MovieObject movieObject = new MovieObject(
+                    cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_POSTER_PATH)),
+                    cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE)),
+                    cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE)),
+                    cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_OVERVIEW)),
+                    cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_MOVIE_ID)));
+            favoriteMovies.add(movieObject);
         }
         return favoriteMovies;
     }
@@ -139,7 +154,7 @@ public class MovieChooserActivity extends AppCompatActivity {
     }
 
     private void showFavoriteMovies() {
-        notifyAdapterWithMovies(movieObjectList);
+        notifyAdapterWithMovies(favoriteMovies);
     }
 
     private void notifyAdapterWithMovies(List<MovieObject> movieObjectList) {

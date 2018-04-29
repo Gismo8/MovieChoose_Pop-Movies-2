@@ -1,9 +1,12 @@
 package com.gismo.moviechoose.activity;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +31,8 @@ import com.gismo.moviechoose.adapter.VideoAdapter;
 import com.gismo.moviechoose.model.MovieObject;
 import com.gismo.moviechoose.model.ReviewObject;
 import com.gismo.moviechoose.model.VideoObject;
+import com.gismo.moviechoose.sqlite.FavoriteMoviesOpenHelper;
+import com.gismo.moviechoose.sqlite.MoviesContract;
 import com.gismo.moviechoose.task.AsyncTaskCompleteListener;
 import com.gismo.moviechoose.task.MovieReviewsAsyncTask;
 import com.gismo.moviechoose.task.MovieVideosAsyncTask;
@@ -77,6 +82,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     ReviewAdapter reviewAdapter;
     VideoAdapter videoAdapter;
     boolean favoriteButtonClicked;
+    protected SQLiteDatabase favMoviesDb;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,6 +106,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
         videoRecyclerView.setAdapter(videoAdapter);
 
         startAsyncTasks(String.valueOf(movieObject.getId()));
+
+        FavoriteMoviesOpenHelper helper = new FavoriteMoviesOpenHelper(this);
+        favMoviesDb = helper.getWritableDatabase();
+
+        favoriteButtonClicked = !isMovieAlreadyFavorite(movieObject.getId());
         setupFloatingActionButton();
 
         bindActivity();
@@ -172,20 +183,45 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     private void setupFloatingActionButton() {
+        if (!favoriteButtonClicked) {
+            favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.buttonInactive)));
+        } else {
+            favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+        }
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!favoriteButtonClicked) {
-                    favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.buttonInactive)));
-                    favoriteButtonClicked = true;
-                    Toast.makeText(MovieDetailsActivity.this, "You added this movie to your favorites", Toast.LENGTH_SHORT).show();
-                } else {
                     favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                    removeMovieToFavorites(movieObject);
                     Toast.makeText(MovieDetailsActivity.this, "You removed this movie from your favorites", Toast.LENGTH_SHORT).show();
+                    favoriteButtonClicked = true;
+                } else {
+                    favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.buttonInactive)));
                     favoriteButtonClicked = false;
+                    addMovieToFavorites(movieObject);
+                    Toast.makeText(MovieDetailsActivity.this, "You added this movie to your favorites", Toast.LENGTH_SHORT).show();
+
                 }
             }
         });
+    }
+
+    private void addMovieToFavorites(MovieObject movieObject) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieObject.getId());
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE, movieObject.getOriginalTitle());
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movieObject.getOverview());
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movieObject.getPosterPath());
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movieObject.getReleaseDate());
+        contentValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movieObject.getVoteAverage());
+        favMoviesDb.insert(MoviesContract.MovieEntry.TABLE_NAME, null, contentValues);
+    }
+
+    private void removeMovieToFavorites(MovieObject movieObject) {
+        favMoviesDb.delete(MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry.COLUMN_MOVIE_ID + "=" + String.valueOf(movieObject.getId()),
+                null);
     }
 
     public void watchYoutubeVideo(String id){
@@ -197,5 +233,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
         } catch (ActivityNotFoundException ex) {
             startActivity(webIntent);
         }
+    }
+
+    private boolean isMovieAlreadyFavorite (int id) {
+        String Query = "Select * from " + MoviesContract.MovieEntry.TABLE_NAME + " where " + MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = " + id;
+        Cursor cursor = favMoviesDb.rawQuery(Query, null);
+        if(cursor.getCount() <= 0){
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
     }
 }
