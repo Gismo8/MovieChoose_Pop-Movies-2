@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.gismo.moviechoose.R;
 import com.gismo.moviechoose.adapter.ReviewAdapter;
+import com.gismo.moviechoose.adapter.VideoAdapter;
 import com.gismo.moviechoose.model.MovieObject;
 import com.gismo.moviechoose.model.ReviewObject;
 import com.gismo.moviechoose.model.VideoObject;
@@ -61,10 +62,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
     RecyclerView reviewsRecyclerView;
     @BindView(R.id.favoriteButton)
     FloatingActionButton favoriteButton;
+    @BindView(R.id.videoRecyclerView)
+    RecyclerView videoRecyclerView;
 
     ArrayList<VideoObject> videoObjects;
     ArrayList<ReviewObject> reviewObjects;
     ReviewAdapter reviewAdapter;
+    VideoAdapter videoAdapter;
     boolean favoriteButtonClicked;
 
     @Override
@@ -78,6 +82,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         reviewAdapter = new ReviewAdapter(this);
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         reviewsRecyclerView.setAdapter(reviewAdapter);
+
+        videoAdapter = new VideoAdapter(this);
+        videoRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        videoRecyclerView.setAdapter(videoAdapter);
 
         startAsyncTasks(String.valueOf(movieObject.getId()));
         setupFloatingActionButton();
@@ -137,8 +145,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         @Override
         public void onTaskComplete(List<VideoObject> result) {
             videoObjects = (ArrayList<VideoObject>) result;
-            videoObjects.toString();
-            //notifyAdapterWithMovies(movieObjectList);
+            videoAdapter.setVideoObjects(videoObjects);
+            videoAdapter.notifyDataSetChanged();
         }
     }
 
@@ -146,7 +154,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         @Override
         public void onTaskComplete(List<ReviewObject> result) {
             reviewObjects = (ArrayList<ReviewObject>) result;
-            reviewObjects.toString();
             reviewAdapter.setReviewObjects(reviewObjects);
             reviewAdapter.notifyDataSetChanged();
         }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="160dp"
+    android:layout_height="100dp"
+    android:background="@color/colorLight"
+    android:layout_marginEnd="8dp"
+    android:foreground="?android:selectableItemBackgroundBorderless"
+    android:clickable="true"
+    tools:targetApi="lollipop"
+    android:layout_marginRight="8dp">
+
+    <ImageView
+        android:id="@+id/thumbNail"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"/>
+
+    <ImageView
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_centerInParent="true"
+        android:alpha="0.6"
+        android:visibility="gone"
+        android:src="@drawable/youtube_play_button_primary"
+        />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="27dp"
+        android:layout_height="27dp"
+        android:layout_gravity="center"
+        android:layout_centerInParent="true"
+        android:visibility="visible" />
+
+</RelativeLayout>

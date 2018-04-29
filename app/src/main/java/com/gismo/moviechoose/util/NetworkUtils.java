@@ -28,6 +28,8 @@ public final class NetworkUtils {
     public static final String MOVIE_PICTURE_BIG = "w1280";
     public static final String MOVIE_PICTURE_ORIGINAL = "original";
 
+    public static final String YOUTUBE_THUMBNAIL_API = "https://img.youtube.com/vi";
+    public static final String YOUTUBE_THUMBNAIL_PICTURE = "0.jpg";
 
     final static String POPULAR = "popular";
     final static String TOP_RATED = "top_rated";
@@ -108,6 +110,24 @@ public final class NetworkUtils {
         return url;
     }
 
+    public static URL buildUrlForYoutubeThumbnail(String videoID) {
+
+        Uri builtUri = Uri.parse(YOUTUBE_THUMBNAIL_API).buildUpon()
+                .appendPath(videoID)
+                .appendPath(YOUTUBE_THUMBNAIL_PICTURE)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
+
+        return url;
+    }
 
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
