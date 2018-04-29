@@ -1,6 +1,10 @@
 package com.gismo.moviechoose.activity;
 
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -41,6 +45,9 @@ import butterknife.ButterKnife;
  */
 
 public class MovieDetailsActivity extends AppCompatActivity {
+
+    private static final String APP_INTENT_STRING = "vnd.youtube:";
+    private static final String WEB_INTENT_STRING = "http://www.youtube.com/watch?v=";
 
     protected MovieObject movieObject;
 
@@ -83,7 +90,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
-        videoAdapter = new VideoAdapter(this);
+        videoAdapter = new VideoAdapter(this, new VideoAdapter.VideoAdapterOnClickHandler() {
+            @Override
+            public void onListItemClick(int clickedItemIndex) {
+                watchYoutubeVideo(videoObjects.get(clickedItemIndex).getKey());
+            }
+        });
         videoRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         videoRecyclerView.setAdapter(videoAdapter);
 
@@ -174,5 +186,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void watchYoutubeVideo(String id){
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APP_INTENT_STRING + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(WEB_INTENT_STRING + id));
+        try {
+            startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            startActivity(webIntent);
+        }
     }
 }

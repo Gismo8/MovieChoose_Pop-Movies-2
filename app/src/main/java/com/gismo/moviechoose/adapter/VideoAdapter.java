@@ -1,6 +1,9 @@
 package com.gismo.moviechoose.adapter;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,16 +30,22 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
 
     private List<VideoObject> videoObjects = new ArrayList<>();
     private Context context;
+    private VideoAdapterOnClickHandler clickHandler;
 
-    public VideoAdapter(Context context) {
+    public VideoAdapter(Context context, VideoAdapterOnClickHandler clickHandler) {
+        this.clickHandler = clickHandler;
         this.context = context;
+    }
+
+    public interface VideoAdapterOnClickHandler {
+        void onListItemClick(int clickedItemIndex);
     }
 
     public VideoObject getItem(int position) {
         return videoObjects.get(position);
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final ImageView thumbnail;
         public final ImageView playButton;
         public final RelativeLayout root;
@@ -48,6 +57,13 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
             root = (RelativeLayout) itemView.getRootView();
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
             playButton = (ImageView) itemView.findViewById(R.id.playButton);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            clickHandler.onListItemClick(adapterPosition);
         }
     }
 
