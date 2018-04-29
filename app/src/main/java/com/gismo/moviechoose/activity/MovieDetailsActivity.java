@@ -1,43 +1,36 @@
 package com.gismo.moviechoose.activity;
 
-import android.annotation.TargetApi;
-import android.graphics.Path;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.gismo.moviechoose.R;
-import com.gismo.moviechoose.enums.SortingOptions;
+import com.gismo.moviechoose.adapter.ReviewAdapter;
 import com.gismo.moviechoose.model.MovieObject;
 import com.gismo.moviechoose.model.ReviewObject;
 import com.gismo.moviechoose.model.VideoObject;
 import com.gismo.moviechoose.task.AsyncTaskCompleteListener;
 import com.gismo.moviechoose.task.MovieReviewsAsyncTask;
 import com.gismo.moviechoose.task.MovieVideosAsyncTask;
-import com.gismo.moviechoose.task.MoviesAsyncTask;
 import com.github.florent37.shapeofview.ShapeOfView;
-import com.github.florent37.shapeofview.manager.ClipPathManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
-
-import static android.view.View.GONE;
 
 /**
  * Created by gismo on 2018. 03. 11..
@@ -58,6 +51,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     ArrayList<VideoObject> videoObjects;
     ArrayList<ReviewObject> reviewObjects;
+    ReviewAdapter reviewAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,6 +60,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
         movieObject = (MovieObject) getIntent().getSerializableExtra(MovieObject.class.getSimpleName());
+
+        reviewAdapter = new ReviewAdapter(this);
+        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        reviewsRecyclerView.setAdapter(reviewAdapter);
 
         startAsyncTasks(String.valueOf(movieObject.getId()));
 
@@ -134,7 +132,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         public void onTaskComplete(List<ReviewObject> result) {
             reviewObjects = (ArrayList<ReviewObject>) result;
             reviewObjects.toString();
-            //notifyAdapterWithMovies(movieObjectList);
+            reviewAdapter.setReviewObjects(reviewObjects);
+            reviewAdapter.notifyDataSetChanged();
         }
     }
 }

@@ -4,4 +4,6 @@
     <string name="top_rated">Highest Rated</string>
     <string name="favorites">Favorites</string>
     <string name="reviews">Reviews</string>
+    <string name="content_formatting">\"%1$s\"</string>
+    <string name="author_formatting">- %1$s -</string>
 </resources>
