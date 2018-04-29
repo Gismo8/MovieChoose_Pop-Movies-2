@@ -5,5 +5,19 @@ package com.gismo.moviechoose.enums;
  */
 
 public enum SortingOptions {
-    TOP_RATED, MOST_POPULAR
+    TOP_RATED("top_rated"), MOST_POPULAR("popular");
+
+    String path;
+
+    SortingOptions(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 }

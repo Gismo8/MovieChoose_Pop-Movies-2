@@ -2,7 +2,6 @@ package com.gismo.moviechoose.task;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.view.View;
 
 import com.gismo.moviechoose.enums.SortingOptions;
 import com.gismo.moviechoose.model.MovieObject;
@@ -12,8 +11,6 @@ import com.gismo.moviechoose.util.NetworkUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-
-import static android.view.View.GONE;
 
 /**
  * Created by gismo on 2018. 03. 13..
@@ -32,11 +29,11 @@ public class MoviesAsyncTask extends AsyncTask<SortingOptions, Void, List<MovieO
 
     @Override
     protected List<MovieObject> doInBackground(SortingOptions... sortingOption) {
-        URL url = NetworkUtils.buildUrl(sortingOption[0]);
+        URL url = NetworkUtils.buildUrlForMovieList(sortingOption[0]);
 
         List<MovieObject> newList;
         try {
-            newList = JSONUtils.extractFeatureFromJson(NetworkUtils.getResponseFromHttpUrl(url));
+            newList = JSONUtils.extractMovieObjectFromJson(NetworkUtils.getResponseFromHttpUrl(url));
             return newList;
         } catch (IOException e) {
             e.printStackTrace();

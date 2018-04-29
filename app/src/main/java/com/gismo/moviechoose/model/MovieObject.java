@@ -19,14 +19,15 @@ public class MovieObject implements Serializable {
     String releaseDate;
     String voteAverage;
     String overview;
+    int id;
 
-
-    public MovieObject(String originalTitle, String posterPath, String releaseDate, String voteAverage, String overview) {
+    public MovieObject(String originalTitle, String posterPath, String releaseDate, String voteAverage, String overview, int id) {
         this.originalTitle = originalTitle;
         this.posterPath = posterPath;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
         this.overview = overview;
+        this.id = id;
     }
 
 
@@ -53,5 +54,9 @@ public class MovieObject implements Serializable {
     public String getImageUrl(boolean isThumbnail) {
         String url = NetworkUtils.MOVIE_PICTURE_URL + (isThumbnail ? NetworkUtils.MOVIE_PICTURE_THUMBNAIL : NetworkUtils.MOVIE_PICTURE_BIG) + getPosterPath();
         return url;
+    }
+
+    public int getId() {
+        return id;
     }
 }
