@@ -38,4 +38,5 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.android.support:design:26.1.0'
+    compile 'com.github.flipkart-incubator:inline-youtube-view:1.0.1'
 }
