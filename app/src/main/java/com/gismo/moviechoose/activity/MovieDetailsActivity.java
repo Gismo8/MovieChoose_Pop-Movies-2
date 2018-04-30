@@ -11,7 +11,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +79,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     FloatingActionButton favoriteButton;
     @BindView(R.id.videoRecyclerView)
     RecyclerView videoRecyclerView;
+    @BindView(R.id.root)
+    ConstraintLayout root;
 
     ArrayList<VideoObject> videoObjects;
     ArrayList<ReviewObject> reviewObjects;
@@ -194,14 +199,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 if (!favoriteButtonClicked) {
                     favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
                     removeMovieToFavorites(movieObject);
-                    Toast.makeText(MovieDetailsActivity.this, "You removed this movie from your favorites", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(root, "You removed this movie from your favorites", 2000).show();
                     favoriteButtonClicked = true;
                 } else {
                     favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.buttonInactive)));
                     favoriteButtonClicked = false;
                     addMovieToFavorites(movieObject);
-                    Toast.makeText(MovieDetailsActivity.this, "You added this movie to your favorites", Toast.LENGTH_SHORT).show();
-
+                    Snackbar.make(root, "You added this movie to your favorites", 2000).show();
                 }
             }
         });
