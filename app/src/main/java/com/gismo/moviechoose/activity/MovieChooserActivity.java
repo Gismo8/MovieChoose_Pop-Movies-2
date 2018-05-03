@@ -17,8 +17,8 @@ import com.gismo.moviechoose.adapter.MovieAdapter;
 import com.gismo.moviechoose.model.MovieObject;
 import com.gismo.moviechoose.R;
 import com.gismo.moviechoose.enums.SortingOptions;
-import com.gismo.moviechoose.sqlite.FavoriteMoviesOpenHelper;
-import com.gismo.moviechoose.sqlite.MoviesContract;
+import com.gismo.moviechoose.data.FavoriteMoviesOpenHelper;
+import com.gismo.moviechoose.data.MoviesContract;
 import com.gismo.moviechoose.task.AsyncTaskCompleteListener;
 import com.gismo.moviechoose.task.MoviesAsyncTask;
 
@@ -32,10 +32,12 @@ import static android.view.View.GONE;
 
 public class MovieChooserActivity extends AppCompatActivity {
 
+    protected final int NUMBER_OF_COLUMNS = 3;
+
+
     protected List<MovieObject> movieObjectList;
     protected ArrayList<MovieObject> favoriteMovies;
     protected MovieAdapter adapter;
-    protected int NUMBER_OF_COLUMNS = 3;
     protected SortingOptions sortingOption = SortingOptions.TOP_RATED;
     protected SQLiteDatabase favMoviesDb;
     protected Cursor cursor;
@@ -73,10 +75,8 @@ public class MovieChooserActivity extends AppCompatActivity {
     }
 
     private Cursor getAllFavoriteMovies() {
-        return favMoviesDb.query(
-                MoviesContract.MovieEntry.TABLE_NAME,
-                null,
-                null,
+       return getContentResolver().query(
+               MoviesContract.BASE_CONTENT_URI,
                 null,
                 null,
                 null,
@@ -95,6 +95,7 @@ public class MovieChooserActivity extends AppCompatActivity {
                     cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_MOVIE_ID)));
             favoriteMovies.add(movieObject);
         }
+        cursor.close();
         return favoriteMovies;
     }
 
@@ -132,7 +133,6 @@ public class MovieChooserActivity extends AppCompatActivity {
                 break;
             case R.id.favorites:
                 showFavoriteMovies();
-                Toast.makeText(this, "favorites selected", Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);

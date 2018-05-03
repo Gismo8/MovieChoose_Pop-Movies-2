@@ -3,6 +3,7 @@
     package="com.gismo.moviechoose">
 
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="com.gismo.moviechoose.TERMS_READ"></uses-permission>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,6 +21,11 @@
 
         <activity android:name=".activity.MovieDetailsActivity"
             android:theme="@style/noActionBar"/>
+        <provider
+            android:authorities="@string/content_authority"
+            android:name=".data.FavoriteMoviesProvider"
+            android:exported="false"
+            android:syncable="true"/>
     </application>
 
 </manifest>

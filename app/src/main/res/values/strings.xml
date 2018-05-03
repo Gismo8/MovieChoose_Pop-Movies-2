@@ -1,9 +1,15 @@
 <resources>
     <string name="app_name">MovieChoose</string>
+    <string name="content_authority">com.gismo.moviechoose</string>
+
+
     <string name="most_popular">Most Popular</string>
     <string name="top_rated">Highest Rated</string>
     <string name="favorites">Favorites</string>
     <string name="reviews">Reviews</string>
     <string name="content_formatting">\"%1$s\"</string>
     <string name="author_formatting">- %1$s -</string>
+    <string name="added_to_favorites">You added this movie to your favorites</string>
+    <string name="removed_from_favorites">You removed this movie from your favorites</string>
+    <string name="no_reviews">There aren\'t any reviews for this movie yet!</string>
 </resources>

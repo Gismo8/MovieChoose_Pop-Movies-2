@@ -2,15 +2,16 @@ package com.gismo.moviechoose.activity;
 
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,13 +20,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.gismo.moviechoose.R;
@@ -34,8 +31,8 @@ import com.gismo.moviechoose.adapter.VideoAdapter;
 import com.gismo.moviechoose.model.MovieObject;
 import com.gismo.moviechoose.model.ReviewObject;
 import com.gismo.moviechoose.model.VideoObject;
-import com.gismo.moviechoose.sqlite.FavoriteMoviesOpenHelper;
-import com.gismo.moviechoose.sqlite.MoviesContract;
+import com.gismo.moviechoose.data.FavoriteMoviesOpenHelper;
+import com.gismo.moviechoose.data.MoviesContract;
 import com.gismo.moviechoose.task.AsyncTaskCompleteListener;
 import com.gismo.moviechoose.task.MovieReviewsAsyncTask;
 import com.gismo.moviechoose.task.MovieVideosAsyncTask;
@@ -81,6 +78,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     RecyclerView videoRecyclerView;
     @BindView(R.id.root)
     ConstraintLayout root;
+    @BindView(R.id.scrollView)
+    ScrollView scrollView;
 
     ArrayList<VideoObject> videoObjects;
     ArrayList<ReviewObject> reviewObjects;
@@ -89,6 +88,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     boolean favoriteButtonClicked;
     protected SQLiteDatabase favMoviesDb;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,7 +151,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Picasso.with(MovieDetailsActivity.this)
-                        .load(movieObject.getImageUrl(false))
+                        .load(movieObject.getImageUrl(true))
                         .centerCrop()
                         .resize(metrics.widthPixels, metrics.heightPixels / 2)
                         .into(posterImage, new com.squareup.picasso.Callback() {
@@ -182,6 +182,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         @Override
         public void onTaskComplete(List<ReviewObject> result) {
             reviewObjects = (ArrayList<ReviewObject>) result;
+            if (reviewObjects.size() == 0) {
+                reviewObjects.add(new ReviewObject("", getResources().getString(R.string.no_reviews)));
+            }
             reviewAdapter.setReviewObjects(reviewObjects);
             reviewAdapter.notifyDataSetChanged();
         }
@@ -199,13 +202,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 if (!favoriteButtonClicked) {
                     favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
                     removeMovieToFavorites(movieObject);
-                    Snackbar.make(root, "You removed this movie from your favorites", 2000).show();
+                    Snackbar.make(root, getText(R.string.removed_from_favorites), 2000).show();
                     favoriteButtonClicked = true;
                 } else {
                     favoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.buttonInactive)));
                     favoriteButtonClicked = false;
                     addMovieToFavorites(movieObject);
-                    Snackbar.make(root, "You added this movie to your favorites", 2000).show();
+                    Snackbar.make(root, getText(R.string.added_to_favorites), 2000).show();
                 }
             }
         });
@@ -219,16 +222,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
         contentValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movieObject.getPosterPath());
         contentValues.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movieObject.getReleaseDate());
         contentValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movieObject.getVoteAverage());
-        favMoviesDb.insert(MoviesContract.MovieEntry.TABLE_NAME, null, contentValues);
+        getContentResolver().insert(MoviesContract.BASE_CONTENT_URI, contentValues);
     }
 
     private void removeMovieToFavorites(MovieObject movieObject) {
-        favMoviesDb.delete(MoviesContract.MovieEntry.TABLE_NAME,
+        getContentResolver().delete(MoviesContract.BASE_CONTENT_URI,
                 MoviesContract.MovieEntry.COLUMN_MOVIE_ID + "=" + String.valueOf(movieObject.getId()),
                 null);
     }
 
-    public void watchYoutubeVideo(String id){
+    public void watchYoutubeVideo(String id) {
         Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(APP_INTENT_STRING + id));
         Intent webIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse(WEB_INTENT_STRING + id));
@@ -239,10 +242,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isMovieAlreadyFavorite (int id) {
+    private boolean isMovieAlreadyFavorite(int id) {
         String Query = "Select * from " + MoviesContract.MovieEntry.TABLE_NAME + " where " + MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = " + id;
         Cursor cursor = favMoviesDb.rawQuery(Query, null);
-        if(cursor.getCount() <= 0){
+        if (cursor.getCount() <= 0) {
             cursor.close();
             return false;
         }

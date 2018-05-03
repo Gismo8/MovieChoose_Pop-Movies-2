@@ -1,10 +1,10 @@
-package com.gismo.moviechoose.sqlite;
+package com.gismo.moviechoose.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import static com.gismo.moviechoose.sqlite.MoviesContract.*;
+import static com.gismo.moviechoose.data.MoviesContract.*;
 
 /**
  * Created by gismo on 2018. 04. 02..

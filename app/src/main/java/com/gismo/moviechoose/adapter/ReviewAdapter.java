@@ -59,8 +59,13 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyViewHold
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         ReviewObject review = reviewObjects.get(position);
-        holder.author.setText(context.getResources().getString(R.string.author_formatting,review.getAuthor()));
-        holder.content.setText(context.getResources().getString(R.string.content_formatting,review.getContent()));
+        if (!review.getContent().equals(context.getResources().getString(R.string.no_reviews))) {
+            holder.author.setText(context.getResources().getString(R.string.author_formatting,review.getAuthor()));
+            holder.content.setText(context.getResources().getString(R.string.content_formatting,review.getContent()));
+        } else {
+            holder.content.setText(review.getContent());
+            holder.author.setVisibility(View.GONE);
+        }
         if (position % 2 == 0) {
             holder.root.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
             holder.author.setTextColor(context.getResources().getColor(R.color.white));
