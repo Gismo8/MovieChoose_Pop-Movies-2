@@ -151,7 +151,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Picasso.with(MovieDetailsActivity.this)
-                        .load(movieObject.getImageUrl(true))
+                        .load(movieObject.getImageUrl(false))
                         .centerCrop()
                         .resize(metrics.widthPixels, metrics.heightPixels / 2)
                         .into(posterImage, new com.squareup.picasso.Callback() {
